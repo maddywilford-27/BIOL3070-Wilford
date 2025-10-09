@@ -1,0 +1,243 @@
+---
+title: "Warm-up mini-Report: Mosquito Blood Hosts in \n Salt Lake City, Utah"
+author: "Maddy Wilford"
+date: "`r Sys.Date()`"
+output:
+  github_document:
+    toc: true
+---
+
+```{r this is for practice, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# ABSTRACT
+
+Fill in abstract at the end after we have finished the methods, results, discussion, conclusions and know what our data "says".
+
+# BACKGROUND
+
+Mosquitoes are considered one of the deadliest animals because they are the biggest vector for transmitting diseases. One those diseases is West Nile Virus (WNV). Since WNV is the most common disease transmitted by mosquitoes, scientists are studying mosquitoes in order to track and navigate the virus. One aspect that scientist study is what hosts are amplifying the transfer of WNV between mosquitoes and other animals. Aviary species are common hosts for WNV. The bar plot below shows the different duration times that viremia can last in different aviary species. House finches and great horned owls seem to host viremia the longest in their system. If we were to place traps in the Salt Lake City area, what bird would be caught the most in the traps located in areas that are psotivive for WNV? From the figure, we cna predict that house finches are probably the ones ampluyfying WNV the most. 
+
+Fill in some text here that provides background info on the WNV system, the blood meal DNA extractions, PCR, sequencing, etc. and the foundation for our question/hypothesis.
+
+For example, we can use the viremia duration (Kumar et al., 2003) bar plot (make sure to reference sources!!!)  to illustrate the potential importance of house finches in WNV transmission and as the logical foundation for our hypothesis that house finches serve as amplifying hosts for WNV... and the prediction that locations with more house finches in our blood host analysis are also the same locations with higher positive tests for WNV in mosquito pools... 
+
+NOTE: Examples of data you can plot for the background info at https://github.com/saarman/BIOL3070/
+
+```{r viremia, include=TRUE, eval=TRUE, warning=FALSE, fig.align='left', fig.width=4.75, fig.height=7}
+# Manually transcribe duration (mean, lo, hi) from the last table column
+duration <- data.frame(
+  Bird = c("Canada Goose","Mallard", 
+           "American Kestrel","Northern Bobwhite",
+           "Japanese Quail","Ring-necked Pheasant",
+           "American Coot","Killdeer",
+           "Ring-billed Gull","Mourning Dove",
+           "Rock Dove","Monk Parakeet",
+           "Budgerigar","Great Horned Owl",
+           "Northern Flicker","Blue Jay",
+           "Black-billed Magpie","American Crow",
+           "Fish Crow","American Robin",
+           "European Starling","Red-winged Blackbird",
+           "Common Grackle","House Finch","House Sparrow"),
+  mean = c(4.0,4.0,4.5,4.0,1.3,3.7,4.0,4.5,5.5,3.7,3.2,2.7,1.7,6.0,4.0,
+           4.0,5.0,3.8,5.0,4.5,3.2,3.0,3.3,6.0,4.5),
+  lo   = c(3,4,4,3,0,3,4,4,4,3,3,1,0,6,3,
+           3,5,3,4,4,3,3,3,5,2),
+  hi   = c(5,4,5,5,4,4,4,5,7,4,4,4,4,6,5,
+           5,5,5,7,5,4,3,4,7,6)
+)
+
+# Choose some colors
+cols <- c(rainbow(30)[c(10:29,1:5)])  # rainbow colors
+
+
+
+# horizontal barplot
+par(mar=c(5,12,2,2))  # wider left margin for names
+bp <- barplot(duration$mean, horiz=TRUE, names.arg=duration$Bird,
+              las=1, col=cols, xlab="Days of detectable viremia", xlim=c(0,7))
+
+# add error bars
+arrows(duration$lo, bp, duration$hi, bp,
+       angle=90, code=3, length=0.05, col="black", xpd=TRUE)
+```
+
+# STUDY QUESTION and HYPOTHESIS
+
+## Question  
+Which aviary host is amplifying the transfer of WNV to mosquitoes the most?
+
+
+## Hypothesis 
+If house finches carry viremia the longest in their system, then they most likely will be the top host that is amplifying the transfer of WNV. 
+
+  
+## Prediction
+If house finches are transferring WNV the most, then we suspect that they will be the top aviary species caught in the
+traps located in positive WNV locations 
+
+# METHODS
+We fist began by crushing up our mosquitoes in order to prepare them for PCR. 
+Once we had our sample ready, we ran a PCR. 
+Once the PCR was complete, we ran a gel electrophoresis
+Then we did a MinION sequncing 
+Once we had that, we analyzed the data 
+
+## Fill in 1st analysis e.g. barplots
+
+Fill in here... Explain that you compared the number of mosquito blood meals from each host species between sites with no WNV-positive pools and sites with one or more WNV-positive pools. Describe why a barplot helps visualize this comparison.
+
+## Barplots of blood meal ID by trap locations with/without WNV positive mosquito pools
+Horizontal plots:
+```{r horiz-plot,fig.align='left',fig.width=7,fig.height=7, warning=FALSE}
+## import counts_matrix: data.frame with column 'loc_positives' (0/1) and host columns 'host_*'
+counts_matrix <- read.csv("./bloodmeal_plusWNV_for_BIOL3070.csv")
+
+## 1) Identify host columns
+host_cols <- grep("^host_", names(counts_matrix), value = TRUE)
+
+if (length(host_cols) == 0) {
+  stop("No columns matching '^host_' were found in counts_matrix.")
+}
+
+## 2) Ensure loc_positives is present and has both levels 0 and 1 where possible
+counts_matrix$loc_positives <- factor(counts_matrix$loc_positives, levels = c(0, 1))
+
+## 3) Aggregate host counts by loc_positives
+agg <- stats::aggregate(
+  counts_matrix[, host_cols, drop = FALSE],
+  by = list(loc_positives = counts_matrix$loc_positives),
+  FUN = function(x) sum(as.numeric(x), na.rm = TRUE)
+)
+
+## make sure both rows exist; if one is missing, add a zero row
+need_levels <- setdiff(levels(counts_matrix$loc_positives), as.character(agg$loc_positives))
+if (length(need_levels)) {
+  zero_row <- as.list(rep(0, length(host_cols)))
+  names(zero_row) <- host_cols
+  for (lv in need_levels) {
+    agg <- rbind(agg, c(lv, zero_row))
+  }
+  ## restore proper type
+  agg$loc_positives <- factor(agg$loc_positives, levels = c("0","1"))
+  ## coerce numeric host cols (they may have become character after rbind)
+  for (hc in host_cols) agg[[hc]] <- as.numeric(agg[[hc]])
+  agg <- agg[order(agg$loc_positives), , drop = FALSE]
+}
+
+## 4) Decide species order (overall abundance, descending)
+overall <- colSums(agg[, host_cols, drop = FALSE], na.rm = TRUE)
+host_order <- names(sort(overall, decreasing = TRUE))
+species_labels <- rev(sub("^host_", "", host_order))  # nicer labels
+
+## 5) Build count vectors for each panel in the SAME order
+counts0 <- rev(as.numeric(agg[agg$loc_positives == 0, host_order, drop = TRUE]))
+counts1 <- rev(as.numeric(agg[agg$loc_positives == 1, host_order, drop = TRUE]))
+
+## 6) Colors: reuse your existing 'cols' if it exists and is long enough; otherwise generate
+if (exists("cols") && length(cols) >= length(host_order)) {
+  species_colors <- setNames(cols[seq_along(host_order)], species_labels)
+} else {
+  species_colors <- setNames(rainbow(length(host_order) + 10)[seq_along(host_order)], species_labels)
+}
+
+## 7) Shared x-limit for comparability
+xmax <- max(c(counts0, counts1), na.rm = TRUE)
+xmax <- if (is.finite(xmax)) xmax else 1
+xlim_use <- c(0, xmax * 1.08)
+
+## 8) Plot: two horizontal barplots with identical order and colors
+op <- par(mfrow = c(1, 2),
+          mar = c(4, 12, 3, 2),  # big left margin for species names
+          xaxs = "i")           # a bit tighter axis padding
+
+## Panel A: No WNV detected (loc_positives = 0)
+barplot(height = counts0,
+        names.arg = species_labels, 
+        cex.names = .5,
+        cex.axis = .5,
+        col = rev(unname(species_colors[species_labels])),
+        horiz = TRUE,
+        las = 1,
+        xlab = "Bloodmeal counts",
+        main = "Locations WNV (-)",
+        xlim = xlim_use)
+
+## Panel B: WNV detected (loc_positives = 1)
+barplot(height = counts1,
+        names.arg = species_labels, 
+        cex.names = .5,
+        cex.axis = .5,
+        col = rev(unname(species_colors[species_labels])),
+        horiz = TRUE,
+        las = 1,
+        xlab = "Bloodmeal counts",
+        main = "Locations WNV (+)",
+        xlim = xlim_use)
+
+par(op)
+
+## Keep the colors mapping for reuse elsewhere
+host_species_colors <- species_colors
+```
+```{r first-analysis, include=TRUE, eval=TRUE, warning=FALSE, fig.align='left', fig.width=4.75, fig.height=7}
+
+```
+
+## Second analysis
+Generalized Linear Model showing the cooelation between house finch blood meals and rates of WNV cases 
+```{r second-analysis-or-plot, include=TRUE, eval=TRUE, warning=FALSE, fig.align='left', fig.width=4.75, fig.height=7}
+
+# second-analysis-or-plot, glm with house finch alone against binary +/_
+glm1 <- glm(loc_positives ~ host_House_finch,
+            data = counts_matrix,
+            family = binomial)
+summary(glm1)
+
+#glm with house-finch alone against positivity rate
+glm2 <- glm(loc_rate ~ host_House_finch,
+            data = counts_matrix)
+summary(glm2)
+```
+
+
+# DISCUSSION
+
+## Plot Interpretation
+The horizontal bar plot shows the amount of different aviary birds caught in traps located in Salt Lake City. They were spit up into two different groups. One tracked the amount of each bird caught in positive WNV locations and the other tracked how many birds were caught in the negative WNV location. 
+
+The plot is showing the amount of aviary birds caught in either a location  
+
+## Analysis Interpretation 
+The Generalized Linear Model (GLM) shows us the correlation between blood meal counts in house finches and the rate of viremia detected. The binary analysis shows us that there is a positive correlation due to the p-value. Given that the p-value is small, we can say that there is a significant enough correlation between the two. Indicating that if there is an increase in blood meal counts from house finches, there is an increase in the rate of detectable viremia. 
+
+Generalized linear model
+responce variable is the rate of WNV
+predictor variable is house finch blood meals 
+How many blood meals did we obtain from house finiches and how does that coorelate with the rate of WNV cases
+Is this signicantly differnet from a flat line?
+Positive coreleation 
+For every HF case, does the rate of WNV go up?
+p-value indicates that there is a significant correlation between house finch blood meal counts and WNV rates 
+
+more house finches = more WNV
+
+This analysis is showing the estimated standard error of whether or not there is significant enough data to show. In the analysis, the p-value, which indicates whether or not the data is significant, was basically zero, indicating that this data is significant 
+
+talk about the p-value and the postive cooelation 
+
+
+
+# Limitations 
+
+# CONCLUSION
+From our data, we can conlude that there is a postive corelation between high blood count meals in house finches and the increased rate of viremia. Meaning, that house finches are one of the top 
+
+# REFERENCES     
+
+1. Komar N, Langevin S, Hinten S, Nemeth N, Edwards E, Hettler D, Davis B, Bowen R, Bunning M. Experimental infection of North American birds with the New York 1999 strain of West Nile virus. Emerg Infect Dis. 2003 Mar;9(3):311-22. https://doi.org/10.3201/eid0903.020628
+
+2. ChatGPT. OpenAI, version Jan 2025. Used as a reference for functions such as plot() and to correct syntax errors. Accessed `r Sys.Date()`.
+
+
+
