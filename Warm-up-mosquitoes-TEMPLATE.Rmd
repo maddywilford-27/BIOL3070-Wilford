@@ -77,11 +77,6 @@ If house finches are transferring WNV the most, then we suspect that they will b
 traps located in positive WNV locations 
 
 # METHODS
-We fist began by crushing up our mosquitoes in order to prepare them for PCR. 
-Once we had our sample ready, we ran a PCR. 
-Once the PCR was complete, we ran a gel electrophoresis
-Then we did a MinION sequncing 
-Once we had that, we analyzed the data 
 
 ## Fill in 1st analysis e.g. barplots
 
