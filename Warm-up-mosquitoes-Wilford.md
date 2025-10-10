@@ -125,10 +125,11 @@ DNA from the PCR and gel.
 
 The horizontal bar plot below shows us what kind of aviary species were
 found in the mosquito blood meals and how many of those birds there
-were. The bar plot not only tells us the positive location sites but
-also compares the birds found in negative WNV locations. This
-visualization helps us to see what birds are amplifying WNV and how many
-of those birds ended up being caught in positive WNV locations.
+were. The bar plot not only tells us the positive location sites (on the
+right) but also compares the birds found in negative WNV locations (on
+the left). This visualization helps us to see what birds are amplifying
+WNV and how many of those birds ended up being caught in positive WNV
+locations.
 
 ``` r
 ## import counts_matrix: data.frame with column 'loc_positives' (0/1) and host columns 'host_*'
@@ -319,7 +320,9 @@ WNV.
 A limitation that we had is that we were limited to a sample of
 mosquitoes that came from the Salt Lake district. So we can only say
 that house finches are amplifying WNV in Salt Lake City and not the rest
-of Utah.
+of Utah. We also don’t know if there could be another species that is
+aiding in amplification if they weren’t caught in the specific traps
+that were set up.
 
 # CONCLUSION
 
@@ -337,10 +340,6 @@ house finches and mosquitoes interact the most could reduce the risk and
 WNV transmission and better protect public health.
 
 # REFERENCES
-
-Fill in here… List all sources you cited in your background and
-throughout the report. Use a consistent style.a conclusion you can draw
-from your analysis.
 
 1.  Komar N, Langevin S, Hinten S, Nemeth N, Edwards E, Hettler D, Davis
     B, Bowen R, Bunning M. Experimental infection of North American
