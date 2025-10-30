@@ -1,0 +1,31 @@
+{
+  "chart": {
+    "title": "Global infant mortality rate with and without vaccines",
+    "subtitle": "Infant mortality rates measure the share of newborns who die before reaching their first birthday. They are shown here as the actual observed change in the global rate (in blue), and a hypothetical scenario if vaccinations hadn't been rolled out (in red).",
+    "citation": "Shattock et al. (2024). Contribution of vaccination to improved survival and health: modelling 50 years of the Expanded Programme on Immunization.",
+    "originalChartUrl": "https://ourworldindata.org/grapher/infant-mortality-vaccines?v=1&csvType=full&useColumnShortNames=false",
+    "selection": [
+      "With vaccines",
+      "Without vaccines"
+    ]
+  },
+  "columns": {
+    "Infant mortality rate": {
+      "titleShort": "Infant mortality rate",
+      "titleLong": "Infant mortality rate",
+      "descriptionKey": [],
+      "shortUnit": "%",
+      "unit": "%",
+      "timespan": "1974-2024",
+      "type": "Numeric",
+      "owidVariableId": 900800,
+      "shortName": "infant_mortality_rate",
+      "lastUpdated": "2024-11-28",
+      "citationShort": "Shattock et al. (2024). Contribution of vaccination to improved survival and health: modelling 50 years of the Expanded Programme on Immunization. – processed by Our World in Data",
+      "citationLong": "Shattock et al. (2024). Contribution of vaccination to improved survival and health: modelling 50 years of the Expanded Programme on Immunization. – processed by Our World in Data. “Infant mortality rate” [dataset]. Shattock et al. (2024). Contribution of vaccination to improved survival and health: modelling 50 years of the Expanded Programme on Immunization., “infant_mortality_vaccination_shattock” [original data].",
+      "fullMetadata": "https://api.ourworldindata.org/v1/indicators/900800.metadata.json"
+    }
+  },
+  "dateDownloaded": "2025-10-28",
+  "activeFilters": {}
+}

@@ -1,0 +1,69 @@
+---
+title: "Independent Project- Wilford"
+author: "Maddy Wilford"
+date: "`r Sys.Date()`"
+output:
+  github_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+ 
+```
+
+#ABSTRACT 
+
+#BACKGROUND 
+
+```{r}
+
+``` 
+
+#STUDY QUESTION & HYPOTHESIS 
+
+##Question 
+
+##Hypothesis
+
+##Prediction 
+
+#METHODS
+
+```{r}
+
+
+``` 
+
+
+hi
+## Scatterplot with line of best fit
+```{r}
+mortality<- read.csv(file="infant-mortality-vaccines.csv")
+
+# Library
+library(ggplot2)
+
+
+# Basic scatter plot.
+p1 <- ggplot(mortality, aes(x=Year, y=mortality_rate)) + 
+  geom_point( color="#69b3a2") 
+
+# with linear trend
+p2 <- ggplot(mortality, aes(x=Year, y=mortality_rate)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", se=FALSE) 
+
+# linear trend + confidence interval
+p3 <- ggplot(mortality, aes(x=Year, y=mortality_rate)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE) 
+
+
+```
+
+#DISCUSION 
+
+#CONCLUSION
+
+#REFERENCES

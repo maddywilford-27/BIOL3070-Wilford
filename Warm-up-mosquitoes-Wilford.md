@@ -1,7 +1,7 @@
 Warm-up mini-Report: Mosquito Blood Hosts in Salt Lake City, Utah
 ================
 Maddy Wilford
-2025-10-10
+2025-10-27
 
 - [ABSTRACT](#abstract)
 - [BACKGROUND](#background)
@@ -347,7 +347,7 @@ WNV transmission and better protect public health.
     Dis. 2003 Mar;9(3):311-22. <https://doi.org/10.3201/eid0903.020628>
 
 2.  ChatGPT. OpenAI, version Jan 2025. Used as a reference for functions
-    such as plot() and to correct syntax errors. Accessed 2025-10-10.
+    such as plot() and to correct syntax errors. Accessed 2025-10-27.
 
 3.  Campbell, G. L., Marfin, A. A., Lanciotti, R. S., & Gubler, D. J.
     (2002). West Nile virus. The Lancet Infectious Diseases, 2(9),
