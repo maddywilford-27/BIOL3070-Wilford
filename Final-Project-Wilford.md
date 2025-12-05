@@ -1,39 +1,73 @@
 Independent Project- Wilford
 ================
 Maddy Wilford
-2025-11-13
+2025-12-04
 
-\#ABSTRACT
+- [ABSTRACT](#abstract)
+- [BACKGROUND](#background)
+- [STUDY QUESTION & HYPOTHESIS](#study-question--hypothesis)
+  - [Question](#question)
+  - [Hypothesis](#hypothesis)
+  - [Prediction](#prediction)
+- [METHODS](#methods)
+  - [Analysis 1: Vaccinated vs Unvaccinated
+    Graph](#analysis-1-vaccinated-vs-unvaccinated-graph)
+  - [Analysis 2: Generalized Linear
+    Model](#analysis-2-generalized-linear-model)
+- [DISCUSION](#discusion)
+- [CONCLUSION](#conclusion)
+- [REFERENCES](#references)
 
-\#BACKGROUND
+# ABSTRACT
 
-Over the span from 1900 to 2018, the United States witnessed a dramatic
-decline in childhood mortality, as captured in the dataset compiled by
-the National Center for Health Statistics (NCHS) that tracks childhood
-death-rates by age at death. At the start of the 20th century, deaths
-among children represented a significant share of overall mortality,
-driven by infectious diseases, poor sanitation, limited medical
-knowledge, and substandard neonatal care (CDC). By mid-century, public
-health interventions, such as improved sanitation, widespread
-immunization, better nutrition, and enhanced maternal and infant health
-services, had begun to reduce these death-rates substantially. In the
-latter decades, advances in neonatal intensive care, accident
-prevention, and chronic disease management further accelerated the
-decline. As a result, by 2018 childhood mortality measured in deaths per
-100,000 children or age-adjusted rates had fallen to a fraction of its
-1900 level, reflecting major gains in child survival and public health
-infrastructure. Nonetheless, the dataset’s documentation notes that
-age-adjusted death-rates after 1998 are calculated using the 2000 U.S.
-standard population and that historical rates prior to 1999 rely on
-older estimation methods.Data.gov. This long-term trend underscores both
-the effectiveness of sustained public health efforts and the changing
-nature of childhood mortality—from largely infectious- and
-sanitation-related causes to a smaller number of deaths from congenital,
-chronic, injury, or perinatal causes. We wanted to test how the rise of
-vaccinations has contributed to the overall decline of child mortality
-rates. We hypothesize that if children get vaccinated, that the rate of
-child mortality will decline more than children who didn’t get
-vaccinated.
+Infant mortality rate (IMR), a key indicator of population health, has
+declined globally over the past century due to improvements in
+sanitation, medical care, nutrition, and the widespread introduction of
+childhood vaccination programs. This study evaluates the long-term
+relationship between vaccination and infant mortality by comparing
+global mortality trends among vaccinated and unvaccinated populations
+from 1974 to 2024, using data obtained from the Our World in Data
+database. To examine this, we conducted both a visual analysis of
+historical IMR trends and a generalized linear model (GLM) to assess
+statistical significance. Our graphical assessment was able to tell us
+that vaccinated groups experienced a greater decline over time,
+improving mortality rates by about 23% more than the unvaccianted groups
+and our GLM produced a low p-value (~0.00), confirming what the
+graphical assessment told us. These findings support the hypothesis that
+infants who receive available vaccinations at or near time of birth have
+significantly lower mortality rates than infants who do not near birth
+have significantly lower mortality rates than those who do not.
+
+# BACKGROUND
+
+At the start of the 20th century, deaths among children represented a
+significant share of overall mortality, driven by infectious diseases,
+poor sanitation, limited medical knowledge, and substandard neonatal
+care (CDC). By mid-century, public health interventions, such as
+improved sanitation, widespread immunization, better nutrition, and
+enhanced maternal and infant health services, had begun to reduce these
+death rates substantially. Infant mortality rate (IMR) stands as a key
+indicator of a nation’s overall health and development. One major global
+effort to improve child survival has been the introduction of widespread
+vaccination programs. The Expanded Programme on Immunization, launched
+by the World Health Organization in 1974, aimed to reduce preventable
+childhood deaths by increasing access to vaccines worldwide (World
+Health Organization). While the effectiveness of vaccines at preventing
+specific diseases is well established, the long-term population-level
+impact is best understood by looking at historical trends in infant
+mortality rates (Shattock et al.,2024). IMR generally reflects deaths
+per 1,000 live births and provides a broad picture of overall living
+conditions. By comparing mortality rates for vaccinated and unvaccinated
+populations over time we can evaluate how strongly vaccination
+contributes to declines in infant deaths on a global scale. We
+hypothesized that infants who receive available vaccinations at or near
+the time of birth have a significantly lower mortality rate than infants
+who do not receive such vaccinations.
+
+Figure 1. A graph illustrating the sharp decline in childhood mortality
+rates (deaths per 100,000 births) within the United States, from the
+year 1900 to 2018. This decline in childhood mortality can be explained
+by several different factors, as explained above.
 
 ``` r
 library(tidyverse)
@@ -41,7 +75,6 @@ library(readr)
 
 file_path <- "NCHS_-_Childhood_Mortality_Rates-1.csv"
 
-# Step 1: Read file lines and detect header row
 raw_lines <- read_lines(file_path)
 header_idx <- which(grepl("^\\s*Year\\s*,", raw_lines))[1]
 
@@ -49,7 +82,6 @@ if (is.na(header_idx)) {
   stop("Header line starting with 'Year,' not found. Please check your CSV file.")
 }
 
-# Step 2: Read CSV from header line onward
 mortality_data <- read_csv(
   file = file_path,
   skip = header_idx - 1,
@@ -57,34 +89,16 @@ mortality_data <- read_csv(
   locale = locale(grouping_mark = ",")
 )
 
-# Step 3: Keep only relevant columns and rename for clarity
 mortality_data <- mortality_data %>%
   select(1:3) %>%
   set_names(c("Year", "AgeGroup", "DeathRate"))
 
-# Step 4: Convert data types safely
 mortality_data <- mortality_data %>%
   mutate(
     Year = as.numeric(Year),
     DeathRate = if (is.character(DeathRate)) parse_number(DeathRate) else DeathRate
   )
 
-# Step 5: Quick preview
-head(mortality_data)
-```
-
-    ## # A tibble: 6 × 3
-    ##    Year AgeGroup  DeathRate
-    ##   <dbl> <chr>         <dbl>
-    ## 1  1900 1-4 Years     1984.
-    ## 2  1901 1-4 Years     1695 
-    ## 3  1902 1-4 Years     1656.
-    ## 4  1903 1-4 Years     1542.
-    ## 5  1904 1-4 Years     1592.
-    ## 6  1905 1-4 Years     1499.
-
-``` r
-# Step 6: Plot line graph (one line per Age Group, or a single one if only one group exists)
 ggplot(mortality_data, aes(x = Year, y = DeathRate, color = AgeGroup, group = AgeGroup)) +
   geom_line(size = 1.2) +
   geom_point(size = 0.9) +
@@ -101,34 +115,49 @@ ggplot(mortality_data, aes(x = Year, y = DeathRate, color = AgeGroup, group = Ag
 
 ![](Final-Project-Wilford_files/figure-gfm/child-mortality-linegraph-1.png)<!-- -->
 
-\#STUDY QUESTION & HYPOTHESIS
+# STUDY QUESTION & HYPOTHESIS
 
-\##Question
+## Question
 
--We wanted to see if between vaccinated and non-vaccinated groups, who
-shows a more significant decline in child mortality?
+We wanted to see how much of a difference vaccination played in
+decreasing infant mortality rates.
 
-\##Hypothesis
+## Hypothesis
 
-If a child gets vaccinated when born, it’s less likely to contribute to
-the infant mortality rates
+Infants who receive available vaccinations at or near time of birth have
+significantly lower mortality rates than infants who do not near birth
+have significantly lower mortality rates than those who do not
 
-\##Prediction
+## Prediction
 
-I predict that the children who don’t get vaccinated will show more of a
-significant decline in child morality
+We predict that vaccination will have a significant contribution to the
+lowering of infant mortality rates.
 
-\#METHODS
+# METHODS
 
-Found data set came up with question coded graph
+For this study, we went to the “Our World in Data” website and pulled
+raw data about global infant mortality rates with and without vaccines
+from years 1974 to 2024. We decided to perform two main analyses to
+evaluate the significance of vaccination for infant mortality rates. We
+ran a visual assessment of the raw data for both groups across time and
+ran a generalized linear model to evaluate the visual findings from the
+graph.
 
-maybe explain why both lines start at the same point
+## Analysis 1: Vaccinated vs Unvaccinated Graph
+
+Figure 2 below depicts a graph that compares the trends of infant
+morality rates (globally) within vaccinated and unvaccinated groups.
+Compiled data ranges from years 1974 to 2024. A best fit line was used
+for each trend to reinforce the visible and computable difference
+between infant mortality rates in vaccinated versus unvaccinated groups
+as well as establish slopes for both groups. Vaccinated groups saw a
+decline of 0.15 deaths per 1,000 births per year, while unvaccinated
+groups saw a decline of 0.11 deaths per 1,000 births per year.
 
 ``` r
-library(dplyr)
 library(ggplot2)
+library(dplyr)
 
-# Load data
 data <- read.csv("infant-mortality-vaccines.csv")
 
 # Clean and prepare
@@ -146,15 +175,6 @@ data$Group <- factor(data$Group, levels = c("Vaccinated", "Unvaccinated"))
 # Create clean version for modeling
 data_long <- data %>%
   select(Year, Mortality = Infant.mortality.rate, Group)
-```
-
-\##Figure 1
-
-The figure below compares the rate of child mortality for vaccinated
-infants vs vaccinated infants
-
-``` r
-library(ggplot2)
 
 ggplot(data_long, aes(x = Year, y = Mortality, color = Group)) +
   geom_point() +
@@ -170,10 +190,13 @@ ggplot(data_long, aes(x = Year, y = Mortality, color = Group)) +
 
 ![](Final-Project-Wilford_files/figure-gfm/plot_lm-1.png)<!-- -->
 
-\##GLM
+## Analysis 2: Generalized Linear Model
 
-The analysis below shows a generalized linear model that tells us if
-getting vaccinated contributes to lowering child mortaltiy rates
+The analysis below depicts a generalized linear model (GLM) that was
+used to evaluate the relationship shown in the graph above and to
+quantify the rate of change in mortality for each group. This will allow
+us to see if infant mortality rates were significant enough to say that
+vaccinations make a difference in IMR.
 
 ``` r
 library(dplyr)
@@ -191,11 +214,9 @@ data <- data %>%
 
 data$Group <- factor(data$Group, levels = c("Vaccinated", "Unvaccinated"))
 
-# Prepare data for modeling
 data_long <- data %>%
   select(Year, Mortality = Infant.mortality.rate, Group)
 
-# Linear model: test if slopes differ by group
 model_interaction <- lm(Mortality ~ Year * Group, data = data_long)
 summary(model_interaction)
 ```
@@ -221,10 +242,76 @@ summary(model_interaction)
     ## Multiple R-squared:  0.9901, Adjusted R-squared:  0.9898 
     ## F-statistic:  3256 on 3 and 98 DF,  p-value: < 2.2e-16
 
-\#DISCUSION
+# DISCUSION
 
-\#CONCLUSION
+Our goal was to see if vaccination played a significant role in
+decreasing infant mortality. Both vaccinated and unvaccinated
+populations experienced declines in infant mortality from 1974-2024 and
+started roughly around the same mortality rate in 1974, but vaccinated
+populations showed greater improvements in infant survival. Based on our
+graph depicted by Figure 2, we were able to see that vaccinated infants
+showed greater improvement, achieving a 72.3% reduction (10.1 to 2.8
+deaths per 1,000 births) compared to the 54.4% reduction (10.3 to 4.7
+deaths per 1,000 births) in the unvaccinated group. Meaning, vaccinated
+populations showed 23.3% lower mortality rates on average. The GLM that
+we performed also confirms this pattern. While mortality decreased in
+both groups, our p-value, which indicates whether our test was
+significant, was 2.2e-16, indicating that vaccination status
+meaningfully predicts differences in the rate of decline. While our
+study demonstrates strong associations between vaccination and reduced
+infant mortality, there are limitations to acknowledge. The dataset
+reflects overall vaccination status rather than specific vaccines, so we
+cannot determine which individual immunizations contributed most to the
+observed decline. Additionally, the data is global rather than
+country-specific, meaning regional differences in healthcare access,
+socioeconomic factors, and public health infrastructure may influence
+outcomes in ways not captured by our analyses. Overall though, these
+findings demonstrate that vaccination not only reduces disease-specific
+risk but also plays a measurable and sustained role in improving infant
+survival.
 
-\#REFERENCES 1. ChatGPT 2. Our world data set 3. Research article for
-background 4.
-<https://data.cdc.gov/National-Center-for-Health-Statistics/NCHS-Childhood-Mortality-Rates/v6ab-adf5/data_preview>
+# CONCLUSION
+
+Based on our data analysis, visual graph, and generalized linear model,
+our findings support our hypothesis that infants who receive
+vaccinations at or near birth experience significantly greater
+improvements in survival compared to those who do not. Although both
+groups began with similar infant mortality rates in 1974, the vaccinated
+population showed a much larger decline over time, improving mortality
+rates by about 23% more than the unvaccinated group on average. These
+trends were confirmed both visually in our plotted data and
+statistically through the generalized linear model, which produced a
+highly significant p-value (2.2e-16), indicating that vaccination status
+meaningfully predicts differences in mortality decline. This information
+can be used to help inform the public about the importance and benefits
+of vaccination. Since vaccines can sometimes be viewed as controversial,
+often due to misunderstandings or lack of clear information, our data
+highlights how strongly vaccination correlates with improved survival
+and healthier childhoods. With research like this, accurate knowledge
+regarding vaccinations can be dispersed as well as the possible
+consequences associated without vaccinating the coming generations.
+
+# REFERENCES
+
+1.  Shattock et al. (2024). Contribution of vaccination to improved
+    survival and health: modelling 50 years of the Expanded Programme on
+    Immunization. – processed by Our World in Data. “Global infant
+    mortality rate with and without vaccines” \[dataset\]. Shattock et
+    al. (2024). Contribution of vaccination to improved survival and
+    health: modelling 50 years of the Expanded Programme on
+    Immunization., “infant_mortality_vaccination_shattock” \[original
+    data\]. Retrieved October 28, 2025 from
+    <https://archive.ourworldindata.org/20250909-093708/grapher/infant-mortality-vaccines.html>
+    (archived on September 9, 2025).
+
+2.  World Health Organization. (n.d.). Essential Programme on
+    immunization. World Health Organization.
+    <https://www.who.int/teams/immunization-vaccines-and-biologicals/essential-programme-on-immunization>
+
+3.  Bastian, B., Tejada Vera, B., & Arias, E. (2020, August 25). NCHS
+    Data Visualization Gallery - mortality trends in the United States.
+    Centers for Disease Control and Prevention.
+    <https://www.cdc.gov/nchs/data-visualization/mortality-trends/index.htm#citation>.
+
+4.  OpenAI. (2025). ChatGPT (Oct 2025 version) \[Large language model\].
+    OpenAI.
